@@ -1,8 +1,33 @@
+let elementsLocation = localStorage.getItem('elementsLocation')
+
+if (elementsLocation) {
+  elementsLocation = JSON.parse(elementsLocation);
+  // elementsLocation = [{ left: 484, top: 105, type: 'square' }];
+  // setElementsLocation();
+} else {
+  elementsLocation = []
+}
+
+function setElementsLocation() {
+  const str = JSON.stringify(elementsLocation);
+  localStorage.setItem('elementsLocation', str)
+}
+
 let isDragging = false;
 
 let container = document.querySelector('#container');
 let canvas = document.querySelector('#canvas');
 let canvasContainer = document.querySelector('#canvasContainer');
+
+function addFigure({ type, left, top }) {
+  let figure = document.createElement('div')
+  figure.className = `hero ${type} draggable`;
+  figure.style.top = top
+  figure.style.left = left
+  figure.style.position = 'absolute'
+  figure.style.zIndex = 1
+  canvasContainer.append(figure)
+}
 
 function addCircle() {
   let circle = document.createElement('div');
@@ -15,6 +40,32 @@ function addSquare() {
   square.className = 'hero square draggable';
   container.append(square);
 }
+
+function mappingStoredElement(elementsLocation) {
+  elementsLocation.forEach((el) => {
+    canvasContainer.append(addFigure(el))
+  })
+}
+
+mappingStoredElement(elementsLocation)
+
+function elementsPreparing(element) {
+  let { top, left } = element.style;
+  let type = element.classList.contains('circle') ? 'circle' : 'square'
+  return { top, left, type }
+}
+
+function beforeUnloadHandler() {
+  elementsLocation = [];
+
+  Array.from(canvasContainer.children).forEach((i) => {
+    elementsLocation.push(elementsPreparing(i))
+  })
+
+  localStorage.setItem('elementsLocation', JSON.stringify(elementsLocation));
+}
+
+window.onbeforeunload = beforeUnloadHandler;
 
 document.addEventListener('mousedown', function (event) {
 
@@ -32,7 +83,7 @@ document.addEventListener('mousedown', function (event) {
 
   // выделение элемента при клике
   if (event.target.className.match('.draggable')) {
-    Array.from(container.children).forEach(el => el.classList.remove('chosen'))
+    Array.from(canvasContainer.children).forEach(el => el.classList.remove('chosen'))
     event.target.classList.add('chosen');
   }
 
@@ -46,7 +97,7 @@ document.addEventListener('mousedown', function (event) {
     moveAt(event.clientX, event.clientY);
   }
 
-  // в начале перемещения элемента:
+  //   в начале перемещения элемента:
   //   запоминаем место клика по элементу (shiftX, shiftY),
   //   переключаем позиционирование элемента (position:fixed) и двигаем элемент
   function startDrag(element, clientX, clientY) {
@@ -65,7 +116,7 @@ document.addEventListener('mousedown', function (event) {
     element.style.zIndex = 1;
     element.style.position = 'fixed';
 
-    if(clientX < container.getBoundingClientRect().right) {
+    if (clientX < container.getBoundingClientRect().right) {
       element.classList.contains('circle') ? addCircle() : addSquare()
     }
 
@@ -83,10 +134,11 @@ document.addEventListener('mousedown', function (event) {
 
     if (event.clientX < canvasContainer.getBoundingClientRect().x || event.clientY < canvasContainer.getBoundingClientRect().y) {
       dragElement.remove();
+    } else {
+      dragElement.style.top = parseInt(dragElement.style.top) + pageYOffset + 'px';
+      dragElement.style.position = 'absolute';
+      canvasContainer.append(dragElement);
     }
-
-    dragElement.style.top = parseInt(dragElement.style.top) + pageYOffset + 'px';
-    dragElement.style.position = 'absolute';
 
     document.removeEventListener('mousemove', onMouseMove);
     dragElement.removeEventListener('mouseup', onMouseUp);
@@ -135,7 +187,7 @@ document.addEventListener('mousedown', function (event) {
         newY = Math.max(newY, 0); // newY не может быть меньше нуля
       }
 
-      // окончательно устанавливаем координаты 
+      // окончательно устанавливаем координаты
       // (в т.ч. чтобы не фигура не выходила за канвас, курсор всё ещё в канвасе)
       newY = clientY > canvas.clientHeight ? Math.max(newY, canvas.clientHeight) : Math.max(newY, 0)
 
@@ -146,7 +198,7 @@ document.addEventListener('mousedown', function (event) {
         newX = document.documentElement.clientWidth - dragElement.offsetWidth;
       }
 
-      // окончательно устанавливаем координаты 
+      // окончательно устанавливаем координаты
       // (в т.ч. чтобы не фигура не выходила за канвас, курсор всё ещё в канвасе)
       newX = clientX > container.clientWidth ? Math.max(newX, container.clientWidth) : Math.max(newX, 0)
 
@@ -159,7 +211,7 @@ document.addEventListener('mousedown', function (event) {
 
 // удаляем выделенный элемент
 document.querySelector('#delete').addEventListener('click', () => {
-  Array.from(container.children).forEach((el) => {
+  Array.from(canvasContainer.children).forEach((el) => {
     if (el.className.match('.chosen')) {
       el.remove();
       return;
