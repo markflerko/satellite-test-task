@@ -2,8 +2,6 @@ let elementsLocation = localStorage.getItem('elementsLocation')
 
 if (elementsLocation) {
   elementsLocation = JSON.parse(elementsLocation);
-  // elementsLocation = [{ left: 484, top: 105, type: 'square' }];
-  // setElementsLocation();
 } else {
   elementsLocation = []
 }
@@ -54,18 +52,6 @@ function elementsPreparing(element) {
   let type = element.classList.contains('circle') ? 'circle' : 'square'
   return { top, left, type }
 }
-
-function beforeUnloadHandler() {
-  elementsLocation = [];
-
-  Array.from(canvasContainer.children).forEach((i) => {
-    elementsLocation.push(elementsPreparing(i))
-  })
-
-  localStorage.setItem('elementsLocation', JSON.stringify(elementsLocation));
-}
-
-window.onbeforeunload = beforeUnloadHandler;
 
 document.addEventListener('mousedown', function (event) {
 
@@ -218,3 +204,28 @@ document.querySelector('#delete').addEventListener('click', () => {
     }
   })
 })
+
+function beforeUnloadHandler() {
+  elementsLocation = [];
+
+  Array.from(canvasContainer.children).forEach((i) => {
+    elementsLocation.push(elementsPreparing(i))
+  })
+
+  localStorage.setItem('elementsLocation', JSON.stringify(elementsLocation));
+}
+
+window.onbeforeunload = beforeUnloadHandler;
+
+let importInput = document.querySelector('#export');
+importInput.onchange = function () {
+  let file = importInput.files[0];
+
+  let reader = new FileReader();
+
+  reader.readAsText(file);
+
+  reader.onload = function () {
+    mappingStoredElement(JSON.parse(reader.result))
+  };
+}
