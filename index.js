@@ -1,17 +1,9 @@
-let elementsLocation = localStorage.getItem('elementsLocation')
-
-if (elementsLocation) {
-  elementsLocation = JSON.parse(elementsLocation);
-} else {
-  elementsLocation = []
-}
-
-let isDragging = false;
-
+// получаем доспут к контейнерам
 let container = document.querySelector('#container');
 let canvas = document.querySelector('#canvas');
 let canvasContainer = document.querySelector('#canvasContainer');
 
+// Вспомогательные функции для создания дом-элементов
 function addFigure({ type, left, top }) {
   let figure = document.createElement('div')
   figure.className = `hero ${type} draggable`;
@@ -34,6 +26,19 @@ function addSquare() {
   container.append(square);
 }
 
+// получаем массив данных с положением элементов на canvasContainer
+// из localStorage
+let elementsLocation = localStorage.getItem('elementsLocation')
+
+if (elementsLocation) {
+  elementsLocation = JSON.parse(elementsLocation);
+} else {
+  elementsLocation = []
+}
+
+let isDragging = false;
+
+// добавляем элементы из хранилища на канвас
 function mappingStoredElement(elementsLocation) {
   elementsLocation.forEach((el) => {
     addFigure(el);
@@ -41,12 +46,6 @@ function mappingStoredElement(elementsLocation) {
 }
 
 mappingStoredElement(elementsLocation)
-
-function elementsPreparing(element) {
-  let { top, left } = element.style;
-  let type = element.classList.contains('circle') ? 'circle' : 'square'
-  return { top, left, type }
-}
 
 document.addEventListener('mousedown', function (event) {
 
@@ -200,11 +199,19 @@ document.querySelector('#delete').addEventListener('click', () => {
   })
 })
 
+// подготовка данных для добавления в localStorage
+function getElementParams(element) {
+  let { top, left } = element.style;
+  let type = element.classList.contains('circle') ? 'circle' : 'square'
+  return { top, left, type }
+}
+
+// сохранение положения элементов перед закрытием страницы
 function beforeUnloadHandler() {
   elementsLocation = [];
 
   Array.from(canvasContainer.children).forEach((i) => {
-    elementsLocation.push(elementsPreparing(i))
+    elementsLocation.push(getElementParams(i))
   })
 
   localStorage.setItem('elementsLocation', JSON.stringify(elementsLocation));
@@ -212,7 +219,7 @@ function beforeUnloadHandler() {
 
 window.onbeforeunload = beforeUnloadHandler;
 
-let importInput = document.querySelector('#export');
+let importInput = document.querySelector('#import');
 
 importInput.onchange = function () {
   canvasContainer.innerHTML = '';
@@ -228,20 +235,19 @@ importInput.onchange = function () {
   };
 }
 
-let a = document.getElementById("a");
+let exportLink = document.getElementById("export");
 
 function download(text) {
   let file = new Blob([text], { type: "application/json" });
-  a.href = URL.createObjectURL(file);
-  a.download = 'dogecoin.json';
+  exportLink.href = URL.createObjectURL(file);
+  exportLink.download = 'dogecoin.json';
 }
 
-a.onclick = () => {
+exportLink.onclick = () => {
   let arr = [];
 
   Array.from(canvasContainer.children).forEach((i) => {
-    arr.push(elementsPreparing(i))
-    console.log(arr);
+    arr.push(getElementParams(i))
   })
 
   download(JSON.stringify(arr))
