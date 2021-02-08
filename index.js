@@ -11,9 +11,9 @@ function addCircle() {
 }
 
 function addSquare() {
-  let circle = document.createElement('div');
-  circle.className = 'hero square draggable';
-  container.append(circle);
+  let square = document.createElement('div');
+  square.className = 'hero square draggable';
+  container.append(square);
 }
 
 document.addEventListener('mousedown', function (event) {
@@ -66,7 +66,7 @@ document.addEventListener('mousedown', function (event) {
     element.style.position = 'fixed';
 
     if(clientX < container.getBoundingClientRect().right) {
-      element.className === 'hero circle draggable' ? addCircle() : addSquare()
+      element.classList.contains('circle') ? addCircle() : addSquare()
     }
 
     moveAt(clientX, clientY);
