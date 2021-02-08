@@ -1,0 +1,70 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.hero {
+  background: url(https://js.cx/drag-heroes/heroes.png);
+  width: 130px;
+  height: 128px;
+  float: left;
+}
+
+.draggable {
+  cursor: pointer;
+}
+
+.circle {
+  border-radius: 50%;
+  background-color: red;
+  position: absolute;
+  /* width: 200px;
+  height: 200px; */
+}
+
+.square {
+  background-color: blue;
+  width: 200px;
+  height: 200px;
+  top: 50vh;
+  position: absolute;
+}
+
+#grid {
+  display: grid;
+  width: 100vw;
+  height: 100vh;
+  /* grid-template-columns: 2fr 8fr; */
+  grid-template: 20vh 80vh / 20vw 80vw;
+}
+
+.figures {
+  background-color: blue;
+}
+
+.canvas {
+  background-color: red;
+}
+
+.figuresContainer {
+  background-color: goldenrod;
+}
+
+.canvasContainer {
+  display: grid;
+  background-color: black;
+  justify-content: right;
+  align-content: flex-end;
+}
+
+.chosen {
+  border: white solid 3px;
+  z-index: 2 !important;
+}
+
+#delete {
+  width: 100px;
+  height: 50px;
+  cursor: pointer;
+}
