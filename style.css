@@ -70,7 +70,7 @@ body {
   width: 100px;
   height: 50px;
   cursor: pointer;
-  bottom: 50px;
+  bottom: 100px;
 }
 
 #export {
@@ -78,5 +78,18 @@ body {
   width: 300px;
   height: 50px;
   cursor: pointer;
+  bottom: 50px;
+}
+
+#a {
+  position: absolute;
+  /* width: 100px;
+  height: 50px; */
+  cursor: pointer;
+  background-color: white;
+  color: black;
+  text-decoration: none;
   bottom: 0px;
+  padding: 5px;
+  border: 1px solid black;
 }

@@ -6,11 +6,6 @@ if (elementsLocation) {
   elementsLocation = []
 }
 
-function setElementsLocation() {
-  const str = JSON.stringify(elementsLocation);
-  localStorage.setItem('elementsLocation', str)
-}
-
 let isDragging = false;
 
 let container = document.querySelector('#container');
@@ -41,7 +36,7 @@ function addSquare() {
 
 function mappingStoredElement(elementsLocation) {
   elementsLocation.forEach((el) => {
-    canvasContainer.append(addFigure(el))
+    addFigure(el);
   })
 }
 
@@ -218,7 +213,10 @@ function beforeUnloadHandler() {
 window.onbeforeunload = beforeUnloadHandler;
 
 let importInput = document.querySelector('#export');
+
 importInput.onchange = function () {
+  canvasContainer.innerHTML = '';
+
   let file = importInput.files[0];
 
   let reader = new FileReader();
@@ -229,3 +227,23 @@ importInput.onchange = function () {
     mappingStoredElement(JSON.parse(reader.result))
   };
 }
+
+let a = document.getElementById("a");
+
+function download(text) {
+  let file = new Blob([text], { type: "application/json" });
+  a.href = URL.createObjectURL(file);
+  a.download = 'dogecoin.json';
+}
+
+a.onclick = () => {
+  let arr = [];
+
+  Array.from(canvasContainer.children).forEach((i) => {
+    arr.push(elementsPreparing(i))
+    console.log(arr);
+  })
+
+  download(JSON.stringify(arr))
+}
+
